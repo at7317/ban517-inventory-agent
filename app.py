@@ -342,6 +342,7 @@ with tab_classification:
     load_default = col_default.button("📁 Load Default `ProjectDataV2_UTF8.csv`", use_container_width=True)
 
     # CSV loading logic – handle uploaded file and default dataset safely
+    default_csv_path = os.path.join(os.path.dirname(__file__), "ProjectDataV2_UTF8.csv")
     df_to_analyze = None
     # If user has uploaded a file, attempt to read it
     if uploaded_file is not None:
