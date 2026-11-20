@@ -341,30 +341,28 @@ with tab_classification:
     uploaded_file = col_upload.file_uploader("Upload CSV Dataset", type=["csv"], help="Upload an inventory CSV file")
     load_default = col_default.button("📁 Load Default `ProjectDataV2_UTF8.csv`", use_container_width=True)
 
+    # CSV loading logic – handle uploaded file and default dataset safely
     df_to_analyze = None
-
-    default_csv_path = os.path.join(os.path.dirname(__file__), "ProjectDataV2_UTF8.csv")
-if uploaded_file is not None:
-    try:
-        df_to_analyze = pd.read_csv(uploaded_file)
-        st.success(f"Successfully loaded uploaded CSV: **{uploaded_file.name}**")
-    except Exception as e:
-        st.error(f"Error reading uploaded CSV: {e}")
-elif load_default or os.path.exists(default_csv_path):
-    if os.path.exists(default_csv_path):
-        df_to_analyze = pd.read_csv(default_csv_path)
-        if load_default:
-            st.success("Loaded project dataset: `ProjectDataV2_UTF8.csv`")
+    # If user has uploaded a file, attempt to read it
+    if uploaded_file is not None:
         try:
             df_to_analyze = pd.read_csv(uploaded_file)
             st.success(f"Successfully loaded uploaded CSV: **{uploaded_file.name}**")
         except Exception as e:
             st.error(f"Error reading uploaded CSV: {e}")
-    elif load_default or os.path.exists("ProjectDataV2_UTF8.csv"):
-        if os.path.exists("ProjectDataV2_UTF8.csv"):
-            df_to_analyze = pd.read_csv("ProjectDataV2_UTF8.csv")
-            if load_default:
+    # If no upload, check if user clicked 'Load Default' button
+    elif load_default:
+        if os.path.exists(default_csv_path):
+            try:
+                df_to_analyze = pd.read_csv(default_csv_path)
                 st.success("Loaded project dataset: `ProjectDataV2_UTF8.csv`")
+            except Exception as e:
+                st.error(f"Error reading default CSV: {e}")
+        else:
+            st.warning("Default dataset `ProjectDataV2_UTF8.csv` not found in the project directory.")
+    # If neither uploaded nor default requested, show an informational prompt
+    else:
+        st.info("Upload a CSV file or click 'Load Default' to analyze inventory data.")
 
     if df_to_analyze is not None:
         # Display dataset metrics
